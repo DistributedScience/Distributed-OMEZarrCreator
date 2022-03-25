@@ -2,13 +2,13 @@
 #                                 - [ BROAD'16 ] -
 #
 # A docker instance for accessing AWS resources
-# This wraps the cellprofiler docker registry
+# This wraps the BioFormats2Raw docker registry
 #
 
 
-FROM someuser/somedocker:sometag
+FROM openmicroscopy/bioformats2raw:0.4.0
 
-# Install S3FS 
+# Install S3FS
 
 RUN apt-get -y update           && \
     apt-get -y upgrade          && \
@@ -40,7 +40,7 @@ RUN apt install -y python3.8-dev python3.8-distutils
 
 # Install AWS CLI
 
-RUN python3.8 -m pip install awscli 
+RUN python3.8 -m pip install awscli
 
 # Install boto3
 
@@ -54,7 +54,7 @@ RUN python3.8 -m pip install watchtower
 
 RUN mkdir -p /home/ubuntu/
 WORKDIR /home/ubuntu
-COPY generic-worker.py .
+COPY B2R-worker.py .
 COPY instance-monitor.py .
 COPY run-worker.sh .
 RUN chmod 755 run-worker.sh
@@ -62,4 +62,3 @@ RUN chmod 755 run-worker.sh
 WORKDIR /home/ubuntu
 ENTRYPOINT ["./run-worker.sh"]
 CMD [""]
-

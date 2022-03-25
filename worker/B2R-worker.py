@@ -6,7 +6,7 @@ import logging
 import os
 import re
 import subprocess
-import sys 
+import sys
 import time
 import watchtower
 import string
@@ -51,7 +51,7 @@ class JobQueue():
     def __init__(self, queueURL):
         self.client = boto3.client('sqs')
         self.queueURL = queueURL
-    
+
     def readMessage(self):
         response = self.client.receive_message(QueueUrl=self.queueURL, WaitTimeSeconds=20)
         if 'Messages' in response.keys():
@@ -81,7 +81,7 @@ def monitorAndLog(process,logger):
             break
         if output:
             print(output.strip())
-            logger.info(output)  
+            logger.info(output)
 
 def printandlog(text,logger):
     print(text)
@@ -104,47 +104,45 @@ def runSomething(message):
 
     # Parse your message somehow to pull out a name variable that's going to make sense to you when you want to look at the logs later
     # What's commented out below will work, otherwise, create your own
-    #group_to_run = message["group"]
-    #groupkeys = list(group_to_run.keys())
-    #groupkeys.sort()
-    #metadataID = '-'.join(groupkeys)
-    
-    # Add a handler with 
-    # watchtowerlogger=watchtower.CloudWatchLogHandler(log_group=LOG_GROUP_NAME, stream_name=str(metadataID),create_log_group=False)
-    # logger.addHandler(watchtowerlogger)
+    group_to_run = message["group"]
+    groupkeys = list(group_to_run.keys())
+    groupkeys.sort()
+    metadataID = '-'.join(groupkeys)
 
-    # See if this is a message you've already handled, if you've so chosen    
-    # First, build a variable called remoteOut that equals your unique prefix of where your output should be 
-    # Then check if there are too many files
-    
+    # Add a handler with
+    watchtowerlogger=watchtower.CloudWatchLogHandler(log_group=LOG_GROUP_NAME, stream_name=str(metadataID),create_log_group=False)
+    logger.addHandler(watchtowerlogger)
+
+    # See if this is a message you've already handled, if you've so chosen
+    # Check for file with plate name in it
     if CHECK_IF_DONE_BOOL.upper() == 'TRUE':
         try:
             s3client=boto3.client('s3')
-            bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=remoteOut+'/')
+            bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=message['output']+'/')
             objectsizelist=[k['Size'] for k in bucketlist['Contents']]
-            objectsizelist = [i for i in objectsizelist if i >= MIN_FILE_SIZE_BYTES]
-            if NECESSARY_STRING:
-                if NECESSARY_STRING != '':
-                    objectsizelist = [i for i in objectsizelist if NECESSARY_STRING in i]
-            if len(objectsizelist)>=int(EXPECTED_NUMBER_FILES):
-                printandlog('File not run due to > expected number of files',logger)
+            objectsizelist = [i for i in objectsizelist if i >= 1]
+            objectsizelist = [i for i in objectsizelist if message['Plate'] in i]
+            if len(objectsizelist)>=1:
+                printandlog('File not run because it already exists and CHECK_IF_DONE=True',logger)
                 logger.removeHandler(watchtowerlogger)
                 return 'SUCCESS'
         except KeyError: #Returned if that folder does not exist
-            pass	
+            pass
 
     # Build and run your program's command
     # ie cmd = my-program --my-flag-1 True --my-flag-2 VARIABLE
     # you should assign the variable "localOut" to the output location where you expect your program to put files
+    cmd = f'bioformats2raw {message['input_location']}/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}'
 
     print('Running', cmd)
     logger.info(cmd)
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     monitorAndLog(subp,logger)
 
-    # Figure out a done condition - a number of files being created, a particular file being created, an exit code, etc. 
+    # Figure out a done condition - a number of files being created, a particular file being created, an exit code, etc.
     # Set its success to the boolean variable `done`
-    
+    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['Plate']}.ome.zarr"})):
+        done = True
     # Get the outputs and move them to S3
     if done:
         time.sleep(30)
@@ -152,8 +150,8 @@ def runSomething(message):
         while mvtries <3:
             try:
                     printandlog('Move attempt #'+str(mvtries+1),logger)
-                    cmd = 'aws s3 mv ' + localOut + ' s3://' + AWS_BUCKET + '/' + remoteOut + ' --recursive' 
-                    subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
+                    cmd = 'aws s3 mv ' + localOut + ' s3://' + AWS_BUCKET + '/' + message['output'] + ' --recursive'
+                    subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out,err = subp.communicate()
                     out=out.decode()
                     err=err.decode()
@@ -184,7 +182,7 @@ def runSomething(message):
         import shutil
         shutil.rmtree(localOut, ignore_errors=True)
         return 'PROBLEM'
-    
+
 
 #################################
 # MAIN WORKER LOOP
@@ -216,4 +214,3 @@ if __name__ == '__main__':
     print('Worker started')
     main()
     print('Worker finished')
-
