@@ -118,7 +118,7 @@ def runSomething(message):
     if CHECK_IF_DONE_BOOL.upper() == 'TRUE':
         try:
             s3client=boto3.client('s3')
-            bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=message['output']+'/')
+            bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=message['output']+'/images_zarr/')
             objectsizelist=[k['Size'] for k in bucketlist['Contents']]
             objectsizelist = [i for i in objectsizelist if i >= 1]
             objectsizelist = [i for i in objectsizelist if message['Plate'] in i]
@@ -132,7 +132,7 @@ def runSomething(message):
     # Build and run your program's command
     # ie cmd = my-program --my-flag-1 True --my-flag-2 VARIABLE
     # you should assign the variable "localOut" to the output location where you expect your program to put files
-    cmd = f'bioformats2raw {message['input_location']}/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}'
+    cmd = f'bioformats2raw {message['input_location']}/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}'
 
     print('Running', cmd)
     logger.info(cmd)
