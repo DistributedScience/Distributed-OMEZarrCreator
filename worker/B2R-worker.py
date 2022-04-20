@@ -22,8 +22,8 @@ AWS_BUCKET = os.environ['AWS_BUCKET']
 LOG_GROUP_NAME= os.environ['LOG_GROUP_NAME']
 if 'CHECK_IF_DONE_BOOL' not in os.environ:
     CHECK_IF_DONE_BOOL = False
-if 'EXPECTED_NUMBER_FILES' not in os.environ:
-    EXPECTED_NUMBER_FILES = 1
+else:
+    CHECK_IF_DONE_BOOL = os.environ['CHECK_IF_DONE_BOOL']
 if 'MIN_FILE_SIZE_BYTES' not in os.environ:
     MIN_FILE_SIZE_BYTES = 1
 else:
@@ -106,10 +106,7 @@ def runSomething(message):
 
     # Parse your message somehow to pull out a name variable that's going to make sense to you when you want to look at the logs later
     # What's commented out below will work, otherwise, create your own
-    group_to_run = message["group"]
-    groupkeys = list(group_to_run.keys())
-    groupkeys.sort()
-    metadataID = '-'.join(groupkeys)
+    metadataID = message["plate"]
 
     # Add a handler with
     watchtowerlogger=watchtower.CloudWatchLogHandler(log_group=LOG_GROUP_NAME, stream_name=str(metadataID),create_log_group=False)
@@ -123,7 +120,7 @@ def runSomething(message):
             bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=message['output']+'/images_zarr/')
             objectsizelist=[k['Size'] for k in bucketlist['Contents']]
             objectsizelist = [i for i in objectsizelist if i >= 1]
-            objectsizelist = [i for i in objectsizelist if message['Plate'] in i]
+            objectsizelist = [i for i in objectsizelist if message['plate'] in i]
             if len(objectsizelist)>=1:
                 printandlog('File not run because it already exists and CHECK_IF_DONE=True',logger)
                 logger.removeHandler(watchtowerlogger)
@@ -134,7 +131,7 @@ def runSomething(message):
     # Build and run your program's command
     # ie cmd = my-program --my-flag-1 True --my-flag-2 VARIABLE
     # you should assign the variable "localOut" to the output location where you expect your program to put files
-    cmd = f"bioformats2raw {message['input_location']}/images/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}"
+    cmd = f"bioformats2raw {message['input_location']}/images/{message['plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}"
 
     print('Running', cmd)
     logger.info(cmd)
@@ -143,7 +140,7 @@ def runSomething(message):
 
     # Figure out a done condition - a number of files being created, a particular file being created, an exit code, etc.
     # Set its success to the boolean variable `done`
-    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['Plate']}.ome.zarr")):
+    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['plate']}.ome.zarr")):
         done = True
     # Get the outputs and move them to S3
     if done:

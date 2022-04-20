@@ -4,10 +4,5 @@
   "path_to_metadata": "Images/Index.idx.xml",
   "resolutions": "4",
   "_comment_on_groups": "The following groups are individual tasks, and each will be run in parallel",
-  "groups": [
-    {"Plate": "PLATEA"},
-    {"Plate": "PLATEB"},
-    {"Plate": "PLATEC"},
-    {"Plate": "PLATED"}
-  ]
+  "plates": ["PLATEA","PLATEB","PLATEC","PLATED"]
 }

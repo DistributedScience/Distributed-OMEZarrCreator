@@ -110,7 +110,7 @@ def generate_task_definition(AWS_PROFILE):
         {
             "name": "SECONDS_TO_START",
             "value": str(SECONDS_TO_START)
-        }     
+        }
     ]
     return task_definition
 
@@ -338,14 +338,14 @@ def submitJob():
 
     # Step 1: Read the job configuration file
     jobInfo = loadConfig(sys.argv[2])
-    templateMessage = {eachkey:jobInfo[eachkey] for eachkey in jobInfo.keys() if eachkey != "groups" and "_comment" not in eachkey}
+    templateMessage = {eachkey:jobInfo[eachkey] for eachkey in jobInfo.keys() if eachkey != "plates" and "_comment" not in eachkey}
 
     # Step 2: Reach the queue and schedule tasks
     print('Contacting queue')
     queue = JobQueue()
     print('Scheduling tasks')
-    for batch in jobInfo["groups"]:
-        templateMessage["group"] = batch
+    for plate in jobInfo["plates"]:
+        templateMessage["plate"] = plate
         queue.scheduleBatch(templateMessage)
     print('Job submitted. Check your queue')
 
