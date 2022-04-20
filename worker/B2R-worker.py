@@ -20,8 +20,10 @@ LOCAL_OUTPUT = '/home/ubuntu/local_output'
 QUEUE_URL = os.environ['SQS_QUEUE_URL']
 AWS_BUCKET = os.environ['AWS_BUCKET']
 LOG_GROUP_NAME= os.environ['LOG_GROUP_NAME']
-CHECK_IF_DONE_BOOL= os.environ['CHECK_IF_DONE_BOOL']
-EXPECTED_NUMBER_FILES= os.environ['EXPECTED_NUMBER_FILES']
+if 'CHECK_IF_DONE_BOOL' not in os.environ:
+    CHECK_IF_DONE_BOOL = False
+if 'EXPECTED_NUMBER_FILES' not in os.environ:
+    EXPECTED_NUMBER_FILES = 1
 if 'MIN_FILE_SIZE_BYTES' not in os.environ:
     MIN_FILE_SIZE_BYTES = 1
 else:
@@ -132,7 +134,7 @@ def runSomething(message):
     # Build and run your program's command
     # ie cmd = my-program --my-flag-1 True --my-flag-2 VARIABLE
     # you should assign the variable "localOut" to the output location where you expect your program to put files
-    cmd = f'bioformats2raw {message['input_location']}/images/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}'
+    cmd = f"bioformats2raw {message['input_location']}/images/{message['Plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}"
 
     print('Running', cmd)
     logger.info(cmd)
@@ -141,7 +143,7 @@ def runSomething(message):
 
     # Figure out a done condition - a number of files being created, a particular file being created, an exit code, etc.
     # Set its success to the boolean variable `done`
-    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['Plate']}.ome.zarr"})):
+    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['Plate']}.ome.zarr")):
         done = True
     # Get the outputs and move them to S3
     if done:
@@ -150,7 +152,7 @@ def runSomething(message):
         while mvtries <3:
             try:
                     printandlog('Move attempt #'+str(mvtries+1),logger)
-                    cmd = f'aws s3 mv {localOut} s3://{AWS_BUCKET}/{message['input']}/images_zarr --recursive'
+                    cmd = f"aws s3 mv {localOut} s3://{AWS_BUCKET}/{message['input']}/images_zarr --recursive"
                     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out,err = subp.communicate()
                     out=out.decode()
