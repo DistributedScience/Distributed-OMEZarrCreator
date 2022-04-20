@@ -9,7 +9,7 @@
 FROM openmicroscopy/bioformats2raw:0.4.0
 
 # Install S3FS
-
+USER root
 RUN apt-get -y update           && \
     apt-get -y upgrade          && \
     apt-get -y install 		\
@@ -36,10 +36,9 @@ RUN make install
 # Install Python - not needed if you've already got it in your container
 # If you have a non-3.8 version, you will need to change python3.8 calls where specified
 
-RUN apt install -y python3.8-dev python3.8-distutils
+RUN apt install -y python3.8-dev python3.8-distutils python3-pip
 
 # Install AWS CLI
-
 RUN python3.8 -m pip install awscli
 
 # Install boto3
