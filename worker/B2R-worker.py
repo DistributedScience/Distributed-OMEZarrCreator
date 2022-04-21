@@ -132,7 +132,7 @@ def runSomething(message):
     # Use os.path.join to account for trailing slashes on inputs
     index_path = os.path.join(message['input_location'],"images",message['plate'],message['path_to_metadata'])
     zarr_path = os.path.join(message['input_location'],"images_zarr",f"{message['plate']}.ome.zarr")
-    cmd = f"bioformats2raw {index_path} {zarr_path} --resolutions {message['resolutions']}"
+    cmd = f"sh /opt/bioformats2raw/bin/bioformats2raw {index_path} {zarr_path} --resolutions {message['resolutions']}"
 
     print('Running', cmd)
     logger.info(cmd)
