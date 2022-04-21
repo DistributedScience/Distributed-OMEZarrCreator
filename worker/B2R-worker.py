@@ -128,10 +128,11 @@ def runSomething(message):
         except KeyError: #Returned if that folder does not exist
             pass
 
-    # Build and run your program's command
-    # ie cmd = my-program --my-flag-1 True --my-flag-2 VARIABLE
-    # you should assign the variable "localOut" to the output location where you expect your program to put files
-    cmd = f"bioformats2raw {message['input_location']}/images/{message['plate']}/{message['path_to_metadata']} {message['input_location']}/images_zarr/{message['Plate']}.ome.zarr --resolutions {message['resolutions']}"
+    # Build and run the program's command
+    # Use os.path.join to account for trailing slashes on inputs
+    index_path = os.path.join(message['input_location'],"images",message['plate'],message['path_to_metadata'])
+    zarr_path = os.path.join(message['input_location'],"images_zarr",f"{message['plate']}.ome.zarr")
+    cmd = f"bioformats2raw {index_path} {zarr_path} --resolutions {message['resolutions']}"
 
     print('Running', cmd)
     logger.info(cmd)
