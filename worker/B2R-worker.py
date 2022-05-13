@@ -128,10 +128,23 @@ def runSomething(message):
         except KeyError: #Returned if that folder does not exist
             pass
 
+    # Download files
+    printandlog('Downloading files', logger)
+    plate_path = os.path.join(message['input_location'],"images",message['plate'])
+    if not os.path.exists(LOCAL_OUTPUT):
+        os.mkdir(LOCAL_OUTPUT)
+
+    cmd = f'cp -r {DATA_ROOT}/{plate_path} {LOCAL_OUTPUT}'
+
+    print('Running', cmd)
+    logger.info(cmd)
+    subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    monitorAndLog(subp,logger)
+
     # Build and run the program's command
     # Use os.path.join to account for trailing slashes on inputs
-    index_path = os.path.join(message['input_location'],"images",message['plate'],message['path_to_metadata'])
-    zarr_path = os.path.join(message['input_location'],"images_zarr",f"{message['plate']}.ome.zarr")
+    index_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",message['path_to_metadata'])
+    zarr_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",f"{message['plate']}.ome.zarr")
     cmd = f"sh /opt/bioformats2raw/bin/bioformats2raw {index_path} {zarr_path} --resolutions {message['resolutions']}"
 
     print('Running', cmd)
