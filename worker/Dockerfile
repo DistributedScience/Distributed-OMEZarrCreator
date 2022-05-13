@@ -6,7 +6,7 @@
 #
 
 
-FROM openmicroscopy/bioformats2raw:0.4.0
+FROM openmicroscopy/bioformats2raw:0.5.0rc1
 
 # Install S3FS
 USER root
@@ -36,18 +36,18 @@ RUN make install
 # Install Python - not needed if you've already got it in your container
 # If you have a non-3.8 version, you will need to change python3.8 calls where specified
 
-RUN apt install -y python3.8-dev python3.8-distutils python3-pip
+RUN apt install -y python3.9-dev python3.9-distutils python3-pip
 
 # Install AWS CLI
-RUN python3.8 -m pip install awscli
+RUN python3.9 -m pip install awscli
 
 # Install boto3
 
-RUN python3.8 -m pip install boto3
+RUN python3.9 -m pip install boto3
 
 # Install watchtower for logging
 
-RUN python3.8 -m pip install watchtower
+RUN python3.9 -m pip install watchtower
 
 # SETUP NEW ENTRYPOINT
 
