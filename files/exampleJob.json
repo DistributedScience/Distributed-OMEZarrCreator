@@ -2,7 +2,14 @@
   "_comment_on_input_location": "Path to the parent folder of your plates of images",
   "input_location": "projects/PROJECTNAME/BATCHNAME/",
   "path_to_metadata": "Images/Index.idx.xml",
-  "resolutions": "4",
-  "_comment_on_groups": "The following groups are individual tasks, and each will be run in parallel",
+  "_comment_on_settings": "If you want to set any of the following parameters, enter a value. Otherwise set to false.",
+  "resolutions": false,
+  "tile_width": false,
+  "tile_height": false,
+  "target-min-size": false,
+  "_comment_on_additional_flags": "Enter any additional flags you want passed to BioFormats2Raw. Otherwise set to false.",
+  "_comment_on_additional_flags2": "e.g. --extra-readers com.glencoesoftware.bioformats2raw.MiraxReader",
+  "additional_flags": false,
+  "_comment_on_plates": "Each plate is an individual task and will be run in parallel",
   "plates": ["PLATEA","PLATEB","PLATEC","PLATED"]
 }

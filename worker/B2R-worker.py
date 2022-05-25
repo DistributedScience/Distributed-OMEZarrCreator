@@ -103,9 +103,6 @@ def runSomething(message):
 
     # Configure the logs
     logger = logging.getLogger(__name__)
-
-    # Parse your message somehow to pull out a name variable that's going to make sense to you when you want to look at the logs later
-    # What's commented out below will work, otherwise, create your own
     metadataID = message["plate"]
 
     # Add a handler with
@@ -143,9 +140,20 @@ def runSomething(message):
 
     # Build and run the program's command
     # Use os.path.join to account for trailing slashes on inputs
+    flags = ''
+    if message['resolutions']:
+        flags = flags + f" --resolutions {message['resolutions']}"
+    if message['tile_width']:
+        flags = flags + f" --tile_width {message['tile_width']}"
+    if message['tile_height']:
+        flags = flags + f" --tile_height {message['tile_height']}"
+    if message['target-min-size']:
+        flags = flags + f" --target-min-size {message['target-min-size']}"
+    if message['additional_flags']:
+        flags = flags + f" {message['additional_flags']}"
     index_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",message['path_to_metadata'])
     zarr_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",f"{message['plate']}.ome.zarr")
-    cmd = f"sh /usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} --target-min-size 2160"
+    cmd = f"sh /usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} {flags}"
 
     print('Running', cmd)
     logger.info(cmd)
