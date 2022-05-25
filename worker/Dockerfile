@@ -33,9 +33,6 @@ RUN ./configure
 RUN make
 RUN make install
 
-# Install Python - not needed if you've already got it in your container
-# If you have a non-3.8 version, you will need to change python3.8 calls where specified
-
 RUN apt install -y python3.9-dev python3.9-distutils python3-pip
 
 # Install AWS CLI

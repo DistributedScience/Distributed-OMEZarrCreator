@@ -145,7 +145,7 @@ def runSomething(message):
     # Use os.path.join to account for trailing slashes on inputs
     index_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",message['path_to_metadata'])
     zarr_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",f"{message['plate']}.ome.zarr")
-    cmd = f"sh /opt/bioformats2raw/bin/bioformats2raw {index_path} {zarr_path} --resolutions {message['resolutions']}"
+    cmd = f"sh /usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} --target-min-size 2160"
 
     print('Running', cmd)
     logger.info(cmd)
