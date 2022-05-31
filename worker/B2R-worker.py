@@ -153,19 +153,15 @@ def runSomething(message):
         flags = flags + f" {message['additional_flags']}"
     index_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",message['path_to_metadata'])
     zarr_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",f"{message['plate']}.ome.zarr")
-    cmd = f"sh /usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} {flags}"
+    cmd = f"/usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} {flags}"
 
     print('Running', cmd)
     logger.info(cmd)
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     monitorAndLog(subp,logger)
 
-    # Figure out a done condition - a number of files being created, a particular file being created, an exit code, etc.
-    # Set its success to the boolean variable `done`
+    # If done, get the outputs and move them to S3
     if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['plate']}.ome.zarr")):
-        done = True
-    # Get the outputs and move them to S3
-    if done:
         time.sleep(30)
         mvtries=0
         while mvtries <3:
