@@ -88,10 +88,6 @@ def generate_task_definition(AWS_PROFILE):
             "value": secret
         },
         {
-            "name": "AWS_BUCKET",
-            "value": AWS_BUCKET
-        },
-        {
             "name": "DOCKER_CORES",
             "value": str(DOCKER_CORES)
         },

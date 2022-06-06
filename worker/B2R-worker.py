@@ -15,10 +15,7 @@ import string
 # CONSTANT PATHS IN THE CONTAINER
 #################################
 
-DATA_ROOT = '/home/ubuntu/bucket'
-LOCAL_OUTPUT = '/home/ubuntu/local_output'
 QUEUE_URL = os.environ['SQS_QUEUE_URL']
-AWS_BUCKET = os.environ['AWS_BUCKET']
 LOG_GROUP_NAME= os.environ['LOG_GROUP_NAME']
 if 'CHECK_IF_DONE_BOOL' not in os.environ:
     CHECK_IF_DONE_BOOL = False
@@ -40,8 +37,6 @@ if 'DOWNLOAD_FILES' not in os.environ:
     DOWNLOAD_FILES = False
 else:
     DOWNLOAD_FILES = os.environ['DOWNLOAD_FILES']
-
-localIn = '/home/ubuntu/local_input'
 
 
 #################################
@@ -94,13 +89,6 @@ def printandlog(text,logger):
 #################################
 
 def runSomething(message):
-    #List the directories in the bucket- this prevents a strange s3fs error
-    rootlist=os.listdir(DATA_ROOT)
-    for eachSubDir in rootlist:
-        subDirName=os.path.join(DATA_ROOT,eachSubDir)
-        if os.path.isdir(subDirName):
-            trashvar=os.system('ls '+subDirName)
-
     # Configure the logs
     logger = logging.getLogger(__name__)
     metadataID = message["plate"]
@@ -114,7 +102,7 @@ def runSomething(message):
     if CHECK_IF_DONE_BOOL.upper() == 'TRUE':
         try:
             s3client=boto3.client('s3')
-            bucketlist=s3client.list_objects(Bucket=AWS_BUCKET,Prefix=message['output']+'/images_zarr/')
+            bucketlist=s3client.list_objects(Bucket=message['output_bucket'],Prefix=message['output_location'])
             objectsizelist=[k['Size'] for k in bucketlist['Contents']]
             objectsizelist = [i for i in objectsizelist if i >= 1]
             objectsizelist = [i for i in objectsizelist if message['plate'] in i]
@@ -127,12 +115,12 @@ def runSomething(message):
 
     # Download files
     printandlog('Downloading files', logger)
-    plate_path = os.path.join(message['input_location'],"images",message['plate'])
-    if not os.path.exists(LOCAL_OUTPUT):
-        os.mkdir(LOCAL_OUTPUT)
+    plate_path = os.path.join(message['input_location'],message['plate'])
+    local_root = '/home/ubuntu/local'
+    local_plate_path = os.path.join(local_root, message['plate'])
+    os.makedirs(local_plate_path, exist_ok=True)
 
-    cmd = f'cp -r {DATA_ROOT}/{plate_path} {LOCAL_OUTPUT}'
-
+    cmd = f'aws s3 cp s3://{message["input_bucket"]}/{plate_path} {local_plate_path} --recursive'
     print('Running', cmd)
     logger.info(cmd)
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -151,8 +139,8 @@ def runSomething(message):
         flags = flags + f" --target-min-size {message['target-min-size']}"
     if message['additional_flags']:
         flags = flags + f" {message['additional_flags']}"
-    index_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",message['path_to_metadata'])
-    zarr_path = os.path.join(f"{LOCAL_OUTPUT}/{message['plate']}",f"{message['plate']}.ome.zarr")
+    index_path = os.path.join(local_plate_path, message['path_to_metadata'])
+    zarr_path = os.path.join(local_root, f"{message['plate']}.ome.zarr")
     cmd = f"/usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} {flags}"
 
     print('Running', cmd)
@@ -160,14 +148,19 @@ def runSomething(message):
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     monitorAndLog(subp,logger)
 
+    print('Finished with .ome.zarr creation.')
+
     # If done, get the outputs and move them to S3
-    if os.path.exists(os.path.join(LOCAL_OUTPUT, f"{message['plate']}.ome.zarr")):
+    if os.path.exists(os.path.join(local_root, f"{message['plate']}.ome.zarr")):
         time.sleep(30)
         mvtries=0
         while mvtries <3:
             try:
                     printandlog('Move attempt #'+str(mvtries+1),logger)
-                    cmd = f"aws s3 mv {localOut} s3://{AWS_BUCKET}/{message['input']}/images_zarr --recursive"
+                    if {message['upload_flags']}:
+                        cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} {message['upload_flags']} --recursive"
+                    else:
+                        cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} --recursive"
                     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out,err = subp.communicate()
                     out=out.decode()
@@ -190,14 +183,14 @@ def runSomething(message):
         else:
             printandlog('SYNC PROBLEM. Giving up on trying to sync '+metadataID,logger)
             import shutil
-            shutil.rmtree(localOut, ignore_errors=True)
+            shutil.rmtree(local_root, ignore_errors=True)
             logger.removeHandler(watchtowerlogger)
             return 'PROBLEM'
     else:
         printandlog('PROBLEM: Failed exit condition for '+metadataID,logger)
         logger.removeHandler(watchtowerlogger)
         import shutil
-        shutil.rmtree(localOut, ignore_errors=True)
+        shutil.rmtree(local_root, ignore_errors=True)
         return 'PROBLEM'
 
 
