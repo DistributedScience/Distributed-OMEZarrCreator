@@ -121,7 +121,7 @@ def runSomething(message):
     os.makedirs(local_plate_path, exist_ok=True)
 
     cmd = f'aws s3 cp s3://{message["input_bucket"]}/{plate_path} {local_plate_path} --recursive'
-    print('Running', cmd)
+    printandlog(f'Running {cmd}',logger)
     logger.info(cmd)
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     monitorAndLog(subp,logger)
@@ -143,12 +143,12 @@ def runSomething(message):
     zarr_path = os.path.join(local_root, f"{message['plate']}.ome.zarr")
     cmd = f"/usr/local/bin/_entrypoint.sh bioformats2raw {index_path} {zarr_path} {flags}"
 
-    print('Running', cmd)
+    printandlog(f'Running {cmd}', logger)
     logger.info(cmd)
     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     monitorAndLog(subp,logger)
 
-    print('Finished with .ome.zarr creation.')
+    printandlog('Finished with .ome.zarr creation.', logger)
 
     # If done, get the outputs and move them to S3
     if os.path.exists(os.path.join(local_root, f"{message['plate']}.ome.zarr")):
@@ -157,10 +157,11 @@ def runSomething(message):
         while mvtries <3:
             try:
                     printandlog('Move attempt #'+str(mvtries+1),logger)
-                    if {message['upload_flags']}:
+                    if message['upload_flags']:
                         cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} {message['upload_flags']} --recursive"
                     else:
                         cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} --recursive"
+                    printandlog(f'Uploading files with command {cmd}',logger)
                     subp = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out,err = subp.communicate()
                     out=out.decode()
