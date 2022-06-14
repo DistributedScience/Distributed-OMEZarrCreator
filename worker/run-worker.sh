@@ -17,21 +17,13 @@ aws ec2 create-tags --resources $VOL_0_ID --tags Key=Name,Value=${APP_NAME}Worke
 VOL_1_ID=$(aws ec2 describe-instance-attribute --instance-id $MY_INSTANCE_ID --attribute blockDeviceMapping --output text --query BlockDeviceMappings[1].Ebs.[VolumeId])
 aws ec2 create-tags --resources $VOL_1_ID --tags Key=Name,Value=${APP_NAME}Worker
 
-# 2. MOUNT S3
-echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY > /credentials.txt
-chmod 600 /credentials.txt
-mkdir -p /home/ubuntu/bucket
-mkdir -p /home/ubuntu/local_output
-stdbuf -o0 s3fs $AWS_BUCKET /home/ubuntu/bucket -o passwd_file=/credentials.txt
-
-# 3. SET UP ALARMS
+# 2. SET UP ALARMS
 aws cloudwatch put-metric-alarm --alarm-name ${APP_NAME}_${MY_INSTANCE_ID} --alarm-actions arn:aws:swf:${AWS_REGION}:${OWNER_ID}:action/actions/AWS_EC2.InstanceId.Terminate/1.0 --statistic Maximum --period 60 --threshold 1 --comparison-operator LessThanThreshold --metric-name CPUUtilization --namespace AWS/EC2 --evaluation-periods 15 --dimensions "Name=InstanceId,Value=${MY_INSTANCE_ID}"
 
-# 4. RUN VM STAT MONITOR
-
+# 3. RUN VM STAT MONITOR
 python3.9 instance-monitor.py &
 
-# 5. RUN CP WORKERS
+# 4. RUN CP WORKERS
 for((k=0; k<$DOCKER_CORES; k++)); do
     python3.9 B2R-worker.py |& tee $k.out &
     sleep $SECONDS_TO_START

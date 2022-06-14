@@ -25,14 +25,6 @@ RUN apt-get -y update           && \
 	sysstat			\
 	curl
 
-WORKDIR /usr/local/src
-RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git
-WORKDIR /usr/local/src/s3fs-fuse
-RUN ./autogen.sh
-RUN ./configure
-RUN make
-RUN make install
-
 RUN apt install -y python3.9-dev python3.9-distutils python3-pip
 
 # Install AWS CLI
