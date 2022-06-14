@@ -2,11 +2,8 @@
 
 echo "Region $AWS_REGION"
 echo "Queue $SQS_QUEUE_URL"
-echo "Bucket $AWS_BUCKET"
 
 # 1. CONFIGURE AWS CLI
-aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
 aws configure set default.region $AWS_REGION
 MY_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 echo "Instance ID $MY_INSTANCE_ID"
