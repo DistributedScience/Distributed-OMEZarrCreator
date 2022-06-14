@@ -24,8 +24,4 @@ aws cloudwatch put-metric-alarm --alarm-name ${APP_NAME}_${MY_INSTANCE_ID} --ala
 python3.9 instance-monitor.py &
 
 # 4. RUN CP WORKERS
-for((k=0; k<$DOCKER_CORES; k++)); do
-    python3.9 B2R-worker.py |& tee $k.out &
-    sleep $SECONDS_TO_START
-done
-wait
+python3.9 B2R-worker.py |& tee $k.out

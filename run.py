@@ -88,10 +88,6 @@ def generate_task_definition(AWS_PROFILE):
             "value": secret
         },
         {
-            "name": "DOCKER_CORES",
-            "value": str(DOCKER_CORES)
-        },
-        {
             "name": "LOG_GROUP_NAME",
             "value": LOG_GROUP_NAME
         },
@@ -103,10 +99,6 @@ def generate_task_definition(AWS_PROFILE):
             "name": "ECS_CLUSTER",
             "value": ECS_CLUSTER
         },
-        {
-            "name": "SECONDS_TO_START",
-            "value": str(SECONDS_TO_START)
-        }
     ]
     return task_definition
 
