@@ -1,6 +1,6 @@
 user = erinweisbart
-project = distributed-BioFormats2Raw
-tag = 0.0.1
+project = distributed-bioformats2raw
+tag = latest
 
 .DEFAULT_GOAL: build
 build:

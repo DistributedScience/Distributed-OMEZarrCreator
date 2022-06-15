@@ -1,10 +1,10 @@
-from __future__ import print_function
 import os, sys
 import boto3
 import datetime
 import json
 import time
 from base64 import b64encode
+import configparser
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -12,7 +12,6 @@ from email.mime.text import MIMEText
 from config import *
 WAIT_TIME = 60
 MONITOR_TIME = 60
-
 
 #################################
 # SETUP TEMPLATES
@@ -66,31 +65,37 @@ def generate_task_definition(AWS_PROFILE):
     config = configparser.ConfigParser()
     config.read(f"{os.environ['HOME']}/.aws/config")
 
-    if config.has_option(f'profile {AWS_PROFILE}', 'source_profile'):
-        creds = configparser.ConfigParser()
-        creds.read(f"{os.environ['HOME']}/.aws/credentials")
-        source_profile = config[f'profile {AWS_PROFILE}']['source_profile']
-        aws_access_key = creds[source_profile]['aws_access_key_id']
-        aws_secret_key = creds[source_profile]['aws_secret_access_key']
-    elif config.has_option(f'profile {AWS_PROFILE}', 'aws_access_key_id'):
-        aws_access_key = config[f'profile {AWS_PROFILE}']['aws_access_key_id']
-        aws_secret_key = config[f'profile {AWS_PROFILE}']['aws_secret_access_key']
+    if config.has_section(AWS_PROFILE):
+        profile_name = AWS_PROFILE
+    elif config.has_section(f'profile {AWS_PROFILE}'):
+        profile_name = f'profile {AWS_PROFILE}'
     else:
-        print ("Problem getting credentials")
+        print ('Problem handling profile')
 
-    task_definition['containerDefinitions'][0]['environment'] += [
-        {
-            "name": "AWS_ACCESS_KEY_ID",
-            "value": aws_access_key
-        },
-        {
-            "name": "AWS_SECRET_ACCESS_KEY",
-            "value": aws_secret_key
-        }]
-
-    if config.has_option(f'profile {AWS_PROFILE}', 'role_arn'):
-        print ("Using role for credentials", config[f'profile {AWS_PROFILE}']['role_arn'])
-        taskRoleArn = config[f'profile {AWS_PROFILE}']['role_arn']
+    if config.has_option(profile_name, 'role_arn'):
+        print ("Using role for credentials", config[profile_name]['role_arn'])
+        taskRoleArn = config[profile_name]['role_arn']
+    else:
+        if config.has_option(profile_name, 'source_profile'):
+            creds = configparser.ConfigParser()
+            creds.read(f"{os.environ['HOME']}/.aws/credentials")
+            source_profile = config[profile_name]['source_profile']
+            aws_access_key = creds[source_profile]['aws_access_key_id']
+            aws_secret_key = creds[source_profile]['aws_secret_access_key']
+        elif config.has_option(profile_name, 'aws_access_key_id'):
+            aws_access_key = config[profile_name]['aws_access_key_id']
+            aws_secret_key = config[profile_name]['aws_secret_access_key']
+        else:
+            print ("Problem getting credentials")
+        task_definition['containerDefinitions'][0]['environment'] += [
+            {
+                "name": "AWS_ACCESS_KEY_ID",
+                "value": aws_access_key
+            },
+            {
+                "name": "AWS_SECRET_ACCESS_KEY",
+                "value": aws_secret_key
+            }]
 
     sqs = boto3.client('sqs')
     queue_name = get_queue_url(sqs)

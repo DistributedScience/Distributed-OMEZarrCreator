@@ -10,7 +10,7 @@ DOCKERHUB_TAG = 'erinweisbart/distributed-bioformats2raw:0.0.19'
 AWS_REGION = 'us-east-1'
 AWS_PROFILE = 'default'                 # The same profile used by your AWS CLI installation
 SSH_KEY_NAME = 'your-key-file.pem'      # Expected to be in ~/.ssh
-AWS_BUCKET = 'your-bucket-name'
+AWS_BUCKET = 'your-bucket-name'         # Bucket to use for logging
 
 # EC2 AND ECS INFORMATION:
 ECS_CLUSTER = 'default'

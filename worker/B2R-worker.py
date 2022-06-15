@@ -172,7 +172,7 @@ def runSomething(message):
     printandlog("Finished with .ome.zarr creation.", logger)
 
     # If done, get the outputs and move them to S3
-    if os.path.exists(os.path.join(local_root, f"{message['plate']}.ome.zarr")):
+    if os.path.exists(zarr_path):
         time.sleep(30)
         mvtries = 0
         while mvtries < 3:
