@@ -172,6 +172,8 @@ def runSomething(message):
     printandlog("Finished with .ome.zarr creation.", logger)
 
     # If done, get the outputs and move them to S3
+    s3path = os.path.join(message['output_bucket'], message['output_location'], f"{message['plate']}.ome.zarr")
+
     if os.path.exists(zarr_path):
         time.sleep(30)
         mvtries = 0
@@ -179,9 +181,9 @@ def runSomething(message):
             try:
                 printandlog("Move attempt #" + str(mvtries + 1), logger)
                 if message["upload_flags"]:
-                    cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} {message['upload_flags']} --recursive"
+                    cmd = f"aws s3 cp {zarr_path} s3://{s3path} {message['upload_flags']} --recursive"
                 else:
-                    cmd = f"aws s3 cp {zarr_path} s3://{message['output_bucket']}/{message['output_location']} --recursive"
+                    cmd = f"aws s3 cp {zarr_path} s3://{s3path} --recursive"
                 printandlog(f"Uploading files with command {cmd}", logger)
                 subp = subprocess.Popen(
                     cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
