@@ -1,15 +1,10 @@
-from __future__ import print_function
 import boto3
-import glob
 import json
 import logging
 import os
-import re
 import subprocess
-import sys
 import time
 import watchtower
-import string
 
 #################################
 # CONSTANT PATHS IN THE CONTAINER
@@ -172,7 +167,11 @@ def runSomething(message):
     printandlog("Finished with .ome.zarr creation.", logger)
 
     # If done, get the outputs and move them to S3
-    s3path = os.path.join(message['output_bucket'], message['output_location'], f"{message['plate']}.ome.zarr")
+    s3path = os.path.join(
+        message["output_bucket"],
+        message["output_location"],
+        f"{message['plate']}.ome.zarr",
+    )
 
     if os.path.exists(zarr_path):
         time.sleep(30)
