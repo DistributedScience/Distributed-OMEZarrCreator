@@ -58,6 +58,6 @@ When the cluster is up and running, you can monitor progress using the following
 The file APP_NAMESpotFleetRequestId.json is created after the cluster is setup in step 3.
 It is important to keep this monitor running if you want to automatically shutdown computing resources when there are no more tasks in the queue (recommended).
 
-See the wiki for more information about each step of the process.
+See our [full documentation website](https://distributedscience.github.io/Distributed-OMEZARRCreator/) for more information about each step of the process.
 
-![Distributed-Something](https://user-images.githubusercontent.com/6721515/148241641-7e447d94-dc25-4214-afb1-132e3dc06987.png)
+![Distributed-OMEZARRCreator schematic](https://user-images.githubusercontent.com/54687786/187761530-daa60b5e-94b8-43cb-a359-1c9d36856b65.png)
