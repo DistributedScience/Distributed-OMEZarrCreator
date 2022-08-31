@@ -18,7 +18,7 @@ CLUSTER_MACHINES = 1                    # Set to <= number of plates you have to
 TASKS_PER_MACHINE = 1
 MACHINE_TYPE = ['c5.xlarge']
 MACHINE_PRICE = 0.10
-EBS_VOL_SIZE = 300                      # In GB.  Make large enough for your source images + .ome.zarr
+EBS_VOL_SIZE = 600                      # In GB.  Make large enough for your source images + .ome.zarr
 
 # DOCKER INSTANCE RUNNING ENVIRONMENT:
 CPU_SHARES = 1024        # ECS computing units assigned to each docker container (1024 units = 1 core)

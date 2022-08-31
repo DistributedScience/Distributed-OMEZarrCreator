@@ -1,4 +1,4 @@
-# Distributed-BioFormats2Raw
+# Distributed-OMEZARRCreator
 Run encapsulated docker containers with a BioFormats2Raw converter in the Amazon Web Services infrastructure.
 Uses [BioFormats2Raw](https://github.com/glencoesoftware/bioformats2raw) to convert image file formats to an intermediate Zarr structure.
 
@@ -14,7 +14,7 @@ There are four AWS components that are minimally needed to run distributed jobs:
 
 All of them can be managed through the AWS Management Console.
 However, this code helps to get started quickly and run a job autonomously if all the configuration is correct.
-The code runs a script that links all these components and prepares the infrastructure to run a distributed job. 
+The code runs a script that links all these components and prepares the infrastructure to run a distributed job.
 When the job is completed, the code is also able to stop resources and clean up components.
 It also adds logging and alarms via CloudWatch, helping the user troubleshoot runs and destroy stuck machines.
 
@@ -60,4 +60,4 @@ It is important to keep this monitor running if you want to automatically shutdo
 
 See the wiki for more information about each step of the process.
 
-![DistributedSomething](https://user-images.githubusercontent.com/6721515/148241641-7e447d94-dc25-4214-afb1-132e3dc06987.png)
+![Distributed-Something](https://user-images.githubusercontent.com/6721515/148241641-7e447d94-dc25-4214-afb1-132e3dc06987.png)
