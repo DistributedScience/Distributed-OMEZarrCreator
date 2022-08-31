@@ -1,6 +1,6 @@
 # Distributed-OMEZARRCreator
 Run encapsulated docker containers with a BioFormats2Raw converter in the Amazon Web Services infrastructure.
-Uses [BioFormats2Raw](https://github.com/glencoesoftware/bioformats2raw) to convert image file formats to an intermediate Zarr structure.
+It uses [BioFormats2Raw](https://github.com/glencoesoftware/bioformats2raw) to convert images to the next-generation file format (NGFF) .ome.zarr.
 
 This code is an example of how to use AWS distributed infrastructure for running BioFormats2Raw.
 The configuration of the AWS resources is done using boto3 and the awscli.
@@ -57,6 +57,8 @@ When the cluster is up and running, you can monitor progress using the following
 
 The file APP_NAMESpotFleetRequestId.json is created after the cluster is setup in step 3.
 It is important to keep this monitor running if you want to automatically shutdown computing resources when there are no more tasks in the queue (recommended).
+
+## Documentation
 
 See our [full documentation website](https://distributedscience.github.io/Distributed-OMEZARRCreator/) for more information about each step of the process.
 
