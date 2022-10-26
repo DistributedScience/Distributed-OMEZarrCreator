@@ -172,8 +172,9 @@ def runSomething(message):
         message["output_location"],
         f"{message['plate']}.ome.zarr",
     )
-
-    if os.path.exists(zarr_path):
+    with open(os.path.join(zarr_path,'.zattrs')) as f:
+        zattrs = json.load(f)
+    if 'plate' in zattrs:
         time.sleep(30)
         mvtries = 0
         while mvtries < 3:
