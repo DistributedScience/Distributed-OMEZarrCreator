@@ -1,19 +1,25 @@
 # Table of contents
-# Learn more at https://jupyterbook.org/customize/toc.html
 
 format: jb-book
-root: overview
 parts:
+- caption: FAQ
+  chapters:
+  - file: overview
+  - file: overview_2
+  - file: costs
 - caption: Running DOZC
   chapters:
   - file: step_0_prep
   - file: step_1_configuration
     sections:
+    - file: config_examples
     - file: SQS_QUEUE_information
   - file: step_2_submit_jobs
   - file: step_3_start_cluster
   - file: step_4_monitor
 - caption:
   chapters:
+  - file: dashboard
+  - file: hygiene
   - file: troubleshooting_runs
   - file: versions
