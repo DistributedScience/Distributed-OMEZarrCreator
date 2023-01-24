@@ -17,7 +17,7 @@ parts:
   - file: step_2_submit_jobs
   - file: step_3_start_cluster
   - file: step_4_monitor
-- caption:
+- caption: Technical Guides
   chapters:
   - file: dashboard
   - file: hygiene
