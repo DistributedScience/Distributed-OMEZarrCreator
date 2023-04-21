@@ -27,7 +27,14 @@ MEMORY = 7500                           # Memory assigned to the docker containe
 # SQS QUEUE INFORMATION:
 SQS_QUEUE_NAME = APP_NAME + 'Queue'
 SQS_MESSAGE_VISIBILITY = 4*60*60        # Timeout (secs) for messages in flight (average time to be processed)
-SQS_DEAD_LETTER_QUEUE = 'arn:aws:sqs:some-region:111111100000:DeadMessages'
+SQS_DEAD_LETTER_QUEUE = 'user_DeadMessages'
+
+# MONITORING
+AUTO_MONITOR = 'True'
+
+# CLOUDWATCH DASHBOARD CREATION
+CREATE_DASHBOARD = 'True'           # Create a dashboard in Cloudwatch for run
+CLEAN_DASHBOARD = 'True'            # Automatically remove dashboard at end of run with Monitor
 
 # REDUNDANCY CHECKS
 CHECK_IF_DONE_BOOL = 'False'  #True or False - should it check if there is already a .zarr file and delete the job if yes?

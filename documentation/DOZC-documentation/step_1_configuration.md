@@ -54,9 +54,22 @@ We recommend setting this to slightly longer than the average amount of time it 
 See [SQS_QUEUE_information](SQS_QUEUE_information) for more information.
 * **SQS_DEAD_LETTER_QUEUE:** The name of the queue to send jobs to if they fail to process correctly multiple times.
 This keeps a single bad job (such as one where a single file has been corrupted) from keeping your cluster active indefinitely.
+This queue will be automatically made if it doesn't exist already.
 See [Step 0: Prep](step_0_prep.med) for more information.
 
 ***
+
+ ### MONITORING
+ * **AUTO_MONITOR:** Whether or not to have Auto-Monitor automatically monitor your jobs.
+
+***
+
+### CLOUDWATCH DASHBOARD CREATION
+
+* **CREATE_DASHBOARD:** Create a Cloudwatch Dashboard that plots run metrics?
+* **CLEAN_DASHBOARD:** Automatically clean up the Cloudwatch Dashboard at the end of the run?
+
+ ***
 
 ### REDUNDANCY CHECKS
 
