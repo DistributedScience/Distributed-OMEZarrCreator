@@ -1,4 +1,4 @@
-# Distributed-OMEZARRCreator
+# Distributed-OMEZarrCreator
 Run encapsulated docker containers with a BioFormats2Raw converter in the Amazon Web Services infrastructure.
 It uses [BioFormats2Raw](https://github.com/glencoesoftware/bioformats2raw) to convert images to the next-generation file format (NGFF) .ome.zarr.
 
@@ -60,6 +60,6 @@ It is important to keep this monitor running if you want to automatically shutdo
 
 ## Documentation
 
-See our [full documentation website](https://distributedscience.github.io/Distributed-OMEZARRCreator/) for more information about each step of the process.
+See our [full documentation website](https://distributedscience.github.io/Distributed-OMEZarrCreator/) for more information about each step of the process.
 
-![Distributed-OMEZARRCreator schematic](https://user-images.githubusercontent.com/54687786/187761530-daa60b5e-94b8-43cb-a359-1c9d36856b65.png)
+![Distributed-OMEZarrCreator schematic](https://user-images.githubusercontent.com/54687786/187761530-daa60b5e-94b8-43cb-a359-1c9d36856b65.png)
