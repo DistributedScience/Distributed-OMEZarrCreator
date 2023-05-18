@@ -6,7 +6,7 @@
 #
 
 
-FROM openmicroscopy/bioformats2raw:0.5.0rc1
+FROM openmicroscopy/bioformats2raw:0.5.0
 
 # Install S3FS
 USER root
