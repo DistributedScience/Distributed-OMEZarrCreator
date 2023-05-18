@@ -9,7 +9,14 @@ import configparser
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+CREATE_DASHBOARD = False
+CLEAN_DASHBOARD = False
+
 from config import *
+
+# Back compatability with old config requirements
+if ':' in SQS_DEAD_LETTER_QUEUE:
+    SQS_DEAD_LETTER_QUEUE = SQS_DEAD_LETTER_QUEUE.rsplit(':',1)[1]
 
 WAIT_TIME = 60
 MONITOR_TIME = 60
